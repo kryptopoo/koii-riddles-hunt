@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
 
   const client = new SpheronClient({
-    token: import.meta.env.SPHERON_STORAGE_KEY || "",
+    token: import.meta.env.VITE_SPHERON_STORAGE_KEY || "",
     apiUrl: "/spheron_api",
   });
 
@@ -130,7 +130,7 @@
     riddle = riddles[Math.floor(Math.random() * riddles.length)];
 
     // get round info from koii node
-    const roundRes = await fetch(`${import.meta.env.NODE_API_URL || ""}/round`);
+    const roundRes = await fetch(`${import.meta.env.VITE_NODE_API_URL || ""}/round`);
     const roundRs = await roundRes.json();
     round = roundRs.round;
   });
@@ -168,7 +168,7 @@
       {#if proofCid != ""}
         <div class="proof" in:fade={{ delay: 300 }}>
           <p>Your proof CID:</p>
-          <p>{proofCid}</p>
+          <div>{proofCid}</div>
         </div>
       {/if}
     </div>

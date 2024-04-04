@@ -9,7 +9,7 @@ export default defineConfig({
       "^/spheron_api": {
         target: "https://api-v2.spheron.network",
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/spheron_api/, ""),
       },
     },
     cors: true,
