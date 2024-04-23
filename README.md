@@ -2,7 +2,15 @@
 
 Koii Riddles Hunt is a decentralized scavenger hunt game that challenges players to solve riddles and earn rewards.
 
-<img src="https://i.ibb.co/Pgpx5Wn/screencapture-localhost-5173-2024-04-04-16-30-07.png" alt="Koii Riddles Hunt" border="0" width="1024px">
+
+<img src="https://i.ibb.co/LnJcywW/koii-riddles-hunt-0.png" alt="koii-riddles-hunt-0" border="0" width="1000px">
+
+
+## TESTNET DEPLOYMENT
+
+#### Task ID: [GBKf2ijKLbjCkrLPtJwuAbdw5FnrLi9ajxU3afF622bd](https://explorer.koii.live/address/GBKf2ijKLbjCkrLPtJwuAbdw5FnrLi9ajxU3afF622bd)
+
+#### App:  https://koii-riddles-hunt.onrender.com
 
 
 ## GETTING STARTED
@@ -19,11 +27,23 @@ cd task-riddles-hunt
 npm start
 ```
 
+## DEPLOYING TASK
+
+```shell
+
+# compile
+npm run webpack
+
+# create task
+npx @_koii/create-task-cli@latest
+
+```
+
 
 ## HOW TO PLAY
 
 The game is opened for each game/task round:
 
-- Player must solve the riddle and submit proof data to IPFS. If successful, the app should return to players a `Proof CID`.
+- Players must solve the riddle and submit proof data to IPFS. If successful, the app should return to players a `Proof CID`.
 - Players open Koii node and start the Koii Riddles Task with `Proof CID`.
-- The Koii node validates player's proof to evaluate the result.
+- The Koii node validates player's proof to evaluate the result and distribute rewards.

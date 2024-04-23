@@ -730,10 +730,10 @@ class NamespaceWrapper {
     // await this.checkVoteStatus();
     console.log('******/  IN VOTING OF DISTRIBUTION LIST /******');
     const taskAccountDataJSON = await this.getTaskState();
-    console.log(
-      `Fetching the Distribution submissions of round ${round}`,
-      taskAccountDataJSON.distribution_rewards_submission[round],
-    );
+    // console.log(
+    //   `Fetching the Distribution submissions of round ${round}`,
+    //   taskAccountDataJSON.distribution_rewards_submission[round],
+    // );
     const submissions =
       taskAccountDataJSON.distribution_rewards_submission[round];
     if (submissions == null) {
@@ -743,12 +743,12 @@ class NamespaceWrapper {
       const keys = Object.keys(submissions);
       const values = Object.values(submissions);
       const size = values.length;
-      console.log(
-        'Distribution Submissions from last round: ',
-        keys,
-        values,
-        size,
-      );
+      // console.log(
+      //   'Distribution Submissions from last round: ',
+      //   keys,
+      //   values,
+      //   size,
+      // );
       let isValid;
       const submitterAccountKeyPair = await this.getSubmitterAccount();
       const submitterPubkey = submitterAccountKeyPair.publicKey.toBase58();
@@ -761,10 +761,10 @@ class NamespaceWrapper {
           console.log('YOU CANNOT VOTE ON YOUR OWN DISTRIBUTION SUBMISSIONS');
         } else {
           try {
-            console.log(
-              'DISTRIBUTION SUBMISSION VALUE TO CHECK',
-              values[i].submission_value,
-            );
+            // console.log(
+            //   'DISTRIBUTION SUBMISSION VALUE TO CHECK',
+            //   values[i].submission_value,
+            // );
             isValid = await validateDistribution(
               values[i].submission_value,
               round,

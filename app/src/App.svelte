@@ -1,9 +1,12 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
+  import { SyncLoader } from "svelte-loading-spinners";
   import { SpheronClient, ProtocolEnum } from "@spheron/storage";
   import { upload } from "@spheron/browser-upload";
   import toast, { Toaster } from "svelte-french-toast";
   import { onMount } from "svelte";
+  import KoiiService from "./lib/KoiiService";
+  import TimeCountdown from "./lib/TimeCountdown.svelte";
 
   const client = new SpheronClient({
     token: import.meta.env.VITE_SPHERON_STORAGE_KEY || "",
@@ -11,12 +14,15 @@
   });
 
   let round = 0;
+  let roundStartTime = 0;
   let answer: string = "";
   let address: string = "";
   let proofCid: string = "";
+  let errorMsg: string = "";
+  let loading = false;
 
   // TODO: keep this in secret
-  let riddles = [
+  const riddles = [
     {
       id: 1,
       question: "What can travel around the world while staying in a corner?",
@@ -122,27 +128,86 @@
       .replace("https://", "")
       .replace(".ipfs.sphn.link", "");
     console.log("uploadId", uploadId);
+    console.log("protocolLink", protocolLink);
     console.log("proofCid", proofCid);
   }
 
   onMount(async () => {
-    // randomize riddle
-    riddle = riddles[Math.floor(Math.random() * riddles.length)];
+    // // get round info from koii node
+    // const roundRes = await fetch(
+    //   `${import.meta.env.VITE_NODE_API_URL || ""}/round`
+    // );
+    // const roundRs = await roundRes.json();
+    // round = roundRs.round;
 
-    // get round info from koii node
-    const roundRes = await fetch(`${import.meta.env.VITE_NODE_API_URL || ""}/round`);
-    const roundRs = await roundRes.json();
-    round = roundRs.round;
+    // get round info from task state
+    try {
+      loading = true;
+      const taskId = import.meta.env.VITE_TASK_ID;
+      const taskState = await KoiiService.getTaskState(taskId);
+      console.log("taskState", taskState);
+      const epochInfo = await KoiiService.getEpochInfo();
+      console.log("epochInfo", epochInfo);
+      const currentRound = Math.floor(
+        (epochInfo.absoluteSlot - taskState.starting_slot) /
+          taskState.round_time
+      );
+      console.log("currentRound", currentRound);
+      const nextRound = currentRound + 1;
+      round = nextRound;
+
+      // calculate startIn time
+      const nextSlot =
+        taskState.starting_slot + nextRound * taskState.round_time;
+      // each slot is roughly equal to 408ms
+      let startInMs = (nextSlot - epochInfo.absoluteSlot) * 408;
+      roundStartTime = Date.now() + startInMs;
+
+      // auto refresh page
+      setTimeout(() => {
+        location.reload();
+      }, startInMs);
+
+      loading = false;
+    } catch (error) {
+      loading = false;
+      errorMsg =
+        "Cannot fetch task metadata. Please refresh the page to try again!";
+      round = 0;
+    }
+
+    // auto connect finnie wallet
+    address = await KoiiService.connectWallet();
+
+    // randomize riddle
+    if (round > 0) {
+      riddle = riddles[Math.floor(Math.random() * riddles.length)];
+    }
   });
 </script>
 
 <main>
   <div>
     <div class="title">Koii Riddles Hunt</div>
-    <div class="sub-title">Round {round}</div>
 
-    {#if round == 0}
-      <div class="error">Cannot fetch node round.</div>
+    {#if loading}
+      <div class="loading">
+        <SyncLoader
+          size="50"
+          color="rgba(255, 255, 255, 0.87)"
+          unit="px"
+          duration="1s"
+        />
+      </div>
+      <div>fetching task metadata...</div>
+    {:else}
+      <div class="sub-title">Round {round}</div>
+      {#if roundStartTime > 0}
+        <TimeCountdown startTime={roundStartTime} />
+      {/if}
+      {#if errorMsg}
+        <div class="error">{errorMsg}</div>
+      {/if}
     {/if}
 
     <div class="card">
@@ -156,7 +221,7 @@
       <input
         size="50"
         bind:value={address}
-        placeholder="Enter your wallet address"
+        placeholder="Enter your node wallet address"
       />
       <div>
         <button
@@ -177,7 +242,34 @@
   <Toaster />
 </main>
 
+<footer>
+  Task ID: <a
+    href="https://explorer.koii.live/address/{import.meta.env.VITE_TASK_ID}"
+    target="_blank">{import.meta.env.VITE_TASK_ID}</a
+  >
+</footer>
+
 <style>
+  footer {
+    position: fixed;
+    left: 0;
+    bottom: 1rem;
+    width: 100%;
+    text-align: center;
+    font-size: small;
+  }
+  a {
+    color: rgba(255, 255, 255, 0.87);
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
   .error {
     color: rgba(255, 0, 0, 0.75);
   }

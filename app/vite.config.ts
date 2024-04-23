@@ -15,4 +15,8 @@ export default defineConfig({
     cors: true,
     port: 5173,
   },
+  define: {
+    "global": {},
+    "ethereum": {}
+  },
 });

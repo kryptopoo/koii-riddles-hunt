@@ -11,7 +11,7 @@ class Submission {
 
     try {
       const value = proofCid;
-      console.log('ROUND', round);
+      console.log(`ROUND_${round}_task`, 'ROUND', round);
 
       if (value) {
         // store value on NeDB
@@ -25,20 +25,14 @@ class Submission {
   }
 
   async submitTask(roundNumber) {
-    console.log('submitTask called with round', roundNumber);
+    console.log(`ROUND_${roundNumber}_submitTask`);
     try {
-      console.log('inside try');
-      console.log(
-        await namespaceWrapper.getSlot(),
-        'current slot while calling submit',
-      );
+      // console.log('inside try');
+      // console.log(await namespaceWrapper.getSlot(), 'current slot while calling submit');
       const submission = await this.fetchSubmission(roundNumber);
-      console.log('SUBMISSION', submission);
-      await namespaceWrapper.checkSubmissionAndUpdateRound(
-        submission,
-        roundNumber,
-      );
-      console.log('after the submission call');
+      console.log(`ROUND_${roundNumber}_submitTask`, 'fetchSubmission', submission);
+      await namespaceWrapper.checkSubmissionAndUpdateRound(submission, roundNumber);
+      // console.log('after the submission call');
       return submission;
     } catch (error) {
       console.log('error in submission', error);
@@ -50,12 +44,12 @@ class Submission {
 
     // fetching round number to store work accordingly
 
-    console.log('IN FETCH SUBMISSION');
+    console.log(`ROUND_${round}_fetchSubmission`);
 
     // The code below shows how you can fetch your stored value from level DB
 
     const value = await namespaceWrapper.storeGet('value'); // retrieves the value
-    console.log('VALUE', value);
+    // console.log('VALUE', value);
     return value;
   }
 }
