@@ -10,7 +10,7 @@
 
   const client = new SpheronClient({
     token: import.meta.env.VITE_SPHERON_STORAGE_KEY || "",
-    apiUrl: "/spheron_api",
+    apiUrl: import.meta.env.VITE_SPHERON_API_URL || "/spheron_api",
   });
 
   let round = 0;
